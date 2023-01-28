@@ -1,0 +1,18 @@
+.container {
+  max-width: 36rem;
+  padding: 0 1rem;
+  margin: 3rem auto 6rem;
+}
+
+.header,
+.footer {
+  text-align: center;
+}
+
+.header {
+  border-block-end: 2px solid;
+}
+
+.footer {
+  border-block-start: 2px solid;
+}
