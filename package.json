@@ -1,9 +1,11 @@
 {
   "dependencies": {
     "@picocss/pico": "^1.5.7",
+    "mysql2": "^3.0.1",
     "next": "^13.1.6",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "sequelize": "^6.28.0"
   },
   "scripts": {
     "dev": "next dev",
