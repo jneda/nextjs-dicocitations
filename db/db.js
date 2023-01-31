@@ -5,4 +5,9 @@ const sequelize = new Sequelize("dictionary", "root", "root", {
   dialect: "mysql",
 });
 
+// sync to database
+(async () => {
+  await sequelize.sync({ alter: true });
+})();
+
 export default sequelize;

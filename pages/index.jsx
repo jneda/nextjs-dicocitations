@@ -1,30 +1,19 @@
-import Layout from "../components/layout";
 import Link from "next/link";
+import Layout from "../components/layout";
+import SearchForm from "../components/SearchForm/SearchForm";
 import Author from "../models/author";
 
 export default function HomePage({ authors }) {
   return (
     <Layout>
       <section>
-        <form action="/quote/show" method="GET">
-          <label>
-            Rechercher une citation
-          </label>
-          <input type="search" name="query" id="query" />
-          <fieldset>
-            <legend>Trier par</legend>
-            <label for="author">
-              <input type="radio" id="author" name="sort" value="author" checked />
-              Auteur
-            </label>
-            <label for="century">
-              <input type="radio" id="century" name="sort" value="century" />
-              Siècle
-            </label>
-          </fieldset>
-          <button type="submit">Rechercher</button>
-        </form>
+        <article>
+          <h1>Citation du jour</h1>
+        </article>
       </section>
+
+      <SearchForm authors={authors} />
+
       <nav>
         <ul>
           <li>
@@ -37,7 +26,9 @@ export default function HomePage({ authors }) {
 }
 
 export async function getServerSideProps(context) {
-  let authors = await Author.findAll();
+  let authors = await Author.findAll({
+    order: [['lastName', 'ASC'], ['firstName', 'ASC']]
+  });
   authors = authors.map(author => author.toJSON());
   return {
     props: { authors }
