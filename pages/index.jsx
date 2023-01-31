@@ -25,7 +25,7 @@ export default function HomePage({ authors }) {
   );
 }
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps() {
   let authors = await Author.findAll({
     order: [['lastName', 'ASC'], ['firstName', 'ASC']]
   });

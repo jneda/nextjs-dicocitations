@@ -10,7 +10,7 @@ export default function ShowQuotes({ quotes }) {
       <td>{author.century}</td>
     </tr>
   ));
-  
+
   return (
     <Layout>
       <table role="grid">
@@ -21,19 +21,21 @@ export default function ShowQuotes({ quotes }) {
             <th scope="col">Siècle</th>
           </tr>
         </thead>
-        <tbody>
-          {quoteRows}
-        </tbody>
+        <tbody>{quoteRows}</tbody>
       </table>
       <nav>
         <ul>
           <li>
-            <Link href="/" role="button" className="outline">&larr; Accueil</Link>
+            <Link href="/" role="button" className="outline">
+              &larr; Accueil
+            </Link>
           </li>
         </ul>
         <ul>
           <li>
-            <Link href="/quote/new" role="button" className="outline">Ajouter une citation</Link>
+            <Link href="/quote/new" role="button" className="outline">
+              Ajouter une citation
+            </Link>
           </li>
         </ul>
       </nav>
@@ -42,10 +44,64 @@ export default function ShowQuotes({ quotes }) {
 }
 
 export async function getServerSideProps(context) {
+  const { query, author: authorId, century, sort } = context.query;
+
   let quotes = await Quote.findAll({ include: "author" });
-  quotes = quotes.map(quote => quote.toJSON());
-  console.log(quotes);
+
+  quotes = quotes
+    .map((quote) => quote.toJSON())
+    .filter((quote) => {
+      return (
+        checkAuthor(quote, authorId) &&
+        checkCentury(quote, century) &&
+        checkQuery(quote, query)
+      );
+    })
+    .sort(sort === "author" ? sortByAuthor : sortByCentury);
+    
   return {
-    props: { quotes }
+    props: { quotes },
   };
+}
+
+function checkAuthor(quote, authorId) {
+  return (
+    authorId === "" ||
+    typeof authorId === "undefined" ||
+    quote.authorId == authorId
+  );
+}
+
+function checkCentury(quote, century) {
+  return (
+    century === "" ||
+    typeof century === "undefined" ||
+    quote.author.century == century
+  );
+}
+
+function checkQuery(quote, query) {
+  return (
+    query === "" ||
+    typeof query === "undefined" ||
+    quote.text.toLowerCase().includes(query.toLowerCase())
+  );
+}
+
+function sortByAuthor(a, b) {
+  if (a.author.lastName < b.author.lastName) {
+    return -1;
+  } else if (a.author.lastName > b.author.lastName) {
+    return 1;
+  }
+  if (a.author.firstName < b.author.firstName) {
+    return -1;
+  } else if (a.author.lastName > b.author.lastName) {
+    return 1;
+  }
+  return 0;
+}
+
+function sortByCentury(a, b) {
+  return a.author.century - b.author.century;
 }

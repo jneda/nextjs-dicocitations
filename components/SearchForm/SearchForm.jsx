@@ -7,7 +7,7 @@ export default function SearchForm({ authors }) {
   const [sortBy, setSortBy] = useState("author");
 
   function submitHandler(e) {
-    e.preventDefault();
+    // e.preventDefault();
     console.log(new FormData(e.target));
   }
 
