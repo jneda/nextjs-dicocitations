@@ -1,45 +1,84 @@
-import Layout from "../../components/layout";
-import Link from "next/link";
+import { useState } from 'react'
+import Layout from '../../components/layout'
+import Link from 'next/link'
 
 export default function NewQuote() {
-  const centuries = [];
-  for (let i = 16; i < 22; i++) {
-    centuries.push(i);
-  }
+  const [lastName, setLastname] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [text, setText] = useState('');
+  const [century, setCentury] = useState('');
 
-  const centuryOptions = centuries.map(century => (
-    <option key={century} value="century">
-      {`${century}`}<sub>e</sub>
-    </option>
-  ))
+  async function onSubmitHandler(e) {
+    e.preventDefault();
+    
+    const postData = {
+      lastName: lastName,
+      firstName: firstName,
+      text: text,
+      century: century
+    };
+    
+    const response = await fetch("/api/quote/add", {
+      method: "POST",
+      "Content-Type": "application/json",
+      body: JSON.stringify(postData)
+    })
+    console.log(await response.json());
+  }
 
   return (
     <Layout>
       <section>
-        <form action="" method="POST">
+        <form action="" method="POST" onSubmit={onSubmitHandler}>
           <fieldset>
             <legend>Auteur</legend>
             <div class="grid">
-              <label for="last-name">
+              <label htmlFor="last-name">
                 Nom
-                <input type="text" name="last-name" id="last-name" required />
+                <input
+                  type="text"
+                  name="last-name"
+                  id="last-name"
+                  value={lastName}
+                  onChange={(e) => setLastname(e.target.value)}
+                  required
+                />
               </label>
-              <label for="first-name">
+              <label htmlFor="first-name">
                 Prénom
-                <input type="text" name="first-name" id="first-name" />
+                <input
+                  type="text"
+                  name="first-name"
+                  id="first-name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
               </label>
             </div>
           </fieldset>
-          <label for="text">
+          <label htmlFor="text">
             Texte
-            <textarea name="text" id="text" required>
+            <textarea
+              name="text"
+              id="text"
+              onChange={(e) => setText(e.target.value)}
+              required
+            >
+              {text}
             </textarea>
           </label>
-          <label for="century">
+          <label htmlFor="century">
             Siècle
-            <select id="century" required>
-              <option value="" selected>Parcourir</option>
-              {centuryOptions}
+            <select
+              id="century"
+              name="century"
+              value={century}
+              onChange={(e) => setCentury(e.target.value)}
+              required
+            >
+              <option value="" selected>
+              </option>
+              {getCenturyOptions()}
             </select>
           </label>
           <button type="submit">Ajouter</button>
@@ -48,10 +87,25 @@ export default function NewQuote() {
       <nav>
         <ul>
           <li>
-            <Link href="/" role="button" className="outline">&larr; Accueil</Link>
+            <Link href="/" role="button" className="outline">
+              &larr; Accueil
+            </Link>
           </li>
         </ul>
       </nav>
     </Layout>
-  );
+  )
+}
+
+function getCenturyOptions() {
+  const centuries = []
+  for (let i = 16; i < 22; i++) {
+    centuries.push(i)
+  }
+
+  return centuries.map((century) => (
+    <option key={century} value={century}>
+      {`${century}`}e
+    </option>
+  ))
 }

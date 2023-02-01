@@ -1,6 +1,8 @@
 import Layout from "../../components/layout";
 import Link from "next/link";
+import { Op } from "sequelize";
 import Quote from "../../models/quote";
+import Author from "../../models/author";
 
 export default function ShowQuotes({ quotes }) {
   const quoteRows = quotes.map(({ id, text, author }) => (
@@ -46,62 +48,27 @@ export default function ShowQuotes({ quotes }) {
 export async function getServerSideProps(context) {
   const { query, author: authorId, century, sort } = context.query;
 
-  let quotes = await Quote.findAll({ include: "author" });
+  const sortKey = sort === "author" ? [[Author, 'lastName'], [Author, "firstName"]] : [[Author, "century"]];
 
-  quotes = quotes
-    .map((quote) => quote.toJSON())
-    .filter((quote) => {
-      return (
-        checkAuthor(quote, authorId) &&
-        checkCentury(quote, century) &&
-        checkQuery(quote, query)
-      );
-    })
-    .sort(sort === "author" ? sortByAuthor : sortByCentury);
-    
-  return {
-    props: { quotes },
+  const options = {
+    include: {
+      model: Author,
+      where: {
+        ...(century && {century: century}),
+        ...(authorId && {id: authorId})
+      }
+    },
+    ...(query && { where: { text: {[Op.like]: `%${query}%`} } }),
+    order: sortKey
   };
-}
 
-function checkAuthor(quote, authorId) {
-  return (
-    authorId === "" ||
-    typeof authorId === "undefined" ||
-    quote.authorId == authorId
-  );
-}
+  let quotes = await Quote.findAll(options);
+  quotes = quotes.map((quote) => quote.toJSON());
 
-function checkCentury(quote, century) {
-  return (
-    century === "" ||
-    typeof century === "undefined" ||
-    quote.author.century == century
-  );
-}
 
-function checkQuery(quote, query) {
-  return (
-    query === "" ||
-    typeof query === "undefined" ||
-    quote.text.toLowerCase().includes(query.toLowerCase())
-  );
-}
-
-function sortByAuthor(a, b) {
-  if (a.author.lastName < b.author.lastName) {
-    return -1;
-  } else if (a.author.lastName > b.author.lastName) {
-    return 1;
+  return {
+    props: {
+      quotes
+    }
   }
-  if (a.author.firstName < b.author.firstName) {
-    return -1;
-  } else if (a.author.lastName > b.author.lastName) {
-    return 1;
-  }
-  return 0;
-}
-
-function sortByCentury(a, b) {
-  return a.author.century - b.author.century;
 }
