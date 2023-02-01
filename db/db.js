@@ -6,8 +6,8 @@ const sequelize = new Sequelize("dictionary", "root", "", {
 });
 
 // sync to database
-(async () => {
+/* (async () => {
   await sequelize.sync({ alter: true });
-})();
+})(); */
 
 export default sequelize;
