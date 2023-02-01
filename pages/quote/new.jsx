@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Layout from '../../components/layout'
 import Link from 'next/link'
+import { toast, Toaster } from 'react-hot-toast';
 
 export default function NewQuote() {
   const [lastName, setLastname] = useState('');
@@ -24,10 +25,12 @@ export default function NewQuote() {
       body: JSON.stringify(postData)
     })
     console.log(await response.json());
+    toast.success("Citation enregistrée !");
   }
 
   return (
     <Layout>
+      <Toaster />
       <section>
         <form action="" method="POST" onSubmit={onSubmitHandler}>
           <fieldset>
